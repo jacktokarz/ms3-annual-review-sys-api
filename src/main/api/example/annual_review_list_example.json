@@ -1,0 +1,22 @@
+[
+  {
+    "annual_review_id":1,
+  	"employee_id":8,
+  	"supervisor_id":1,
+  	"self_assessment_avg":5,
+  	"mgr_assessment_avg":4,
+  	"completed_dt":"2015-08-04",
+  	"start_dt":"2015-07-04",
+  	"status":"Completed"
+  },
+  {
+    "annual_review_id":1,
+  	"employee_id":8,
+  	"supervisor_id":1,
+  	"self_assessment_avg":5,
+  	"mgr_assessment_avg":4,
+  	"completed_dt":"2016-08-04",
+  	"start_dt":"2016-07-04",
+  	"status":"Completed"
+  }
+]

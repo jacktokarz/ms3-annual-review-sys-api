@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <sub-flow name="404_router_subflow">
+        <choice doc:name="Choice">
+            <when expression="#[payload==empty]">
+                <flow-ref name="404-error" doc:name="404-error"/>
+            </when>
+            <otherwise>
+                <json:object-to-json-transformer doc:name="Object to JSON"/>
+            </otherwise>
+        </choice>
+    </sub-flow>
+    <flow name="409-error">
+        <set-property propertyName="http.status" value="409" doc:name="Property"/>
+        <set-payload value="{ &quot;message&quot;: &quot;Conflict - Wrong Data Appended&quot; }" doc:name="Set Payload"/>
+    </flow>
+    <flow name="404-error">
+        <set-property propertyName="http.status" value="404" doc:name="Property"/>
+        <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" doc:name="Set Payload"/>
+    </flow>
+    <flow name="get_all_annual_reviews">
+        <component class="com.ms3.annualReviewSysAPI.queryBuilder.WhereQueryBuilder" doc:name="Java"/>
+        <db:select config-ref="MySQL_Configuration" doc:name="Database">
+            <db:dynamic-query><![CDATA[SELECT * FROM ANNUAL_REVIEW #[flowVars.WHERE_CLAUSE]]]></db:dynamic-query>
+        </db:select>
+        <flow-ref name="404_router_subflow" doc:name="404_router_subflow"/>
+        <exception-strategy ref="globalChoice_Exception_Strategy" doc:name="Reference Exception Strategy"/>
+    </flow>
+    <flow name="get_annual_review_for_id">
+        <db:select config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[SELECT * FROM ANNUAL_REVIEW WHERE annual_review_id=#[message.inboundProperties.'http.uri.params'.annual_review_id]]]></db:parameterized-query>
+        </db:select>
+        <flow-ref name="404_router_subflow" doc:name="404_router_subflow"/>
+        <exception-strategy ref="globalChoice_Exception_Strategy" doc:name="Reference Exception Strategy"/>
+    </flow>
+    <flow name="insert_annual_review">
+        <json:json-to-object-transformer returnClass="java.util.HashMap" doc:name="JSON to Object"/>
+        <enricher source="#[payload]" target="#[variable:result]" doc:name="Message Enricher">
+            <db:select config-ref="MySQL_Configuration" doc:name="Database">
+                <db:parameterized-query><![CDATA[SELECT * FROM ANNUAL_REVIEW WHERE employee_id=#[payload.employee_id] AND start_dt=#[payload.start_dt]]]></db:parameterized-query>
+            </db:select>
+        </enricher>
+        <choice doc:name="Choice">
+            <when expression="#[flowVars.result==empty]">
+                <db:insert config-ref="MySQL_Configuration" doc:name="Database">
+                    <db:parameterized-query><![CDATA[INSERT INTO ANNUAL_REVIEW (supervisor_id,employee_id,self_assessment_avg,mgr_assessment_avg,completed_dt,status,start_dt) VALUES (#[payload.supervisor_id],#[payload.employee_id],#[payload.self_assessment_avg], #[payload.mgr_assessment_avg],IF(((#[payload.completed_dt] is null) or (#[payload.completed_dt]='')), NULL,#[payload.completed_dt]),#[payload.status],#[payload.start_dt])]]></db:parameterized-query>
+                </db:insert>
+                <set-payload value="{&quot;message&quot;:&quot;Annual Review created Successfully&quot;}" doc:name="Set Payload"/>
+            </when>
+            <otherwise>
+                <flow-ref name="409-error" doc:name="409-error"/>
+            </otherwise>
+        </choice>
+        <exception-strategy ref="globalChoice_Exception_Strategy" doc:name="Reference Exception Strategy"/>
+    </flow>
+    <flow name="update_annual_review_for_id">
+        <json:json-to-object-transformer returnClass="java.util.Map" doc:name="JSON to Object"/>
+        <component class="com.ms3.annualReviewSysAPI.queryBuilder.UpdateQueryBuilder" doc:name="Java"/>
+        <db:update config-ref="MySQL_Configuration" doc:name="Database">
+            <db:dynamic-query><![CDATA[#[flowVars.UPDATE_QUERY]]]></db:dynamic-query>
+        </db:update>
+        <choice doc:name="Choice">
+            <when expression="#[payload==0]">
+                <flow-ref name="404-error" doc:name="404-error"/>
+            </when>
+            <otherwise>
+                <set-payload value="{ &quot;message&quot;: &quot;Annual Review updated successfully&quot; }" doc:name="Set Payload"/>
+            </otherwise>
+        </choice>
+        <exception-strategy ref="globalChoice_Exception_Strategy" doc:name="Reference Exception Strategy"/>
+    </flow>
+    <flow name="delete_annual_review_with_id">
+        <db:delete config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[DELETE FROM ANNUAL_REVIEW WHERE annual_review_id=(#[message.inboundProperties.'http.uri.params'.annual_review_id])]]></db:parameterized-query>
+        </db:delete>
+        <choice doc:name="Choice">
+            <when expression="#[payload==0]">
+                <flow-ref name="404-error" doc:name="404-error"/>
+            </when>
+            <otherwise>
+                <set-payload value="{ &quot;message&quot;: &quot;Annual Review deleted successfully&quot; }" doc:name="Set Payload"/>
+            </otherwise>
+        </choice>
+    </flow>
+</mule>
