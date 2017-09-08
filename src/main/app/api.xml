@@ -3,35 +3,35 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
-    <http:listener-config name="annualReview_sys_api-httpListenerConfig" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+
     <apikit:config name="annualReview_sys_api-config" raml="annualReview_sys_api.raml" consoleEnabled="false" doc:name="Router"/>
     <flow name="annualReview_sys_api-main">
-        <http:listener config-ref="annualReview_sys_api-httpListenerConfig" path="/api/*" doc:name="HTTP"/>
+        <http:listener config-ref="HttpListenerConfig" path="/api/*" doc:name="HTTP"/>
         <apikit:router config-ref="annualReview_sys_api-config" doc:name="APIkit Router"/>
         <exception-strategy ref="annualReview_sys_api-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy"/>
     </flow>
     <flow name="annualReview_sys_api-console">
-        <http:listener config-ref="annualReview_sys_api-httpListenerConfig" path="/console/*" doc:name="HTTP"/>
+        <http:listener config-ref="HttpListenerConfig" path="/console/*" doc:name="HTTP"/>
         <apikit:console config-ref="annualReview_sys_api-config" doc:name="APIkit Console"/>
     </flow>
     <flow name="delete:/annualreview/{annual_review_id}:annualReview_sys_api-config">
-        <flow-ref name="delete_annual_review_with_id" doc:name="delete_annual_review_with_id"/>
+        <flow-ref name="deleteAnnualReviewWithId" doc:name="deleteAnnualReviewWithId"/>
 
     </flow>
     <flow name="patch:/annualreview/{annual_review_id}:application/json:annualReview_sys_api-config">
-        <flow-ref name="update_annual_review_for_id" doc:name="update_annual_review_for_id"/>
+        <flow-ref name="updateAnnualReviewForId" doc:name="updateAnnualReviewForId"/>
 
     </flow>
     <flow name="get:/annualreview:annualReview_sys_api-config">
-        <flow-ref name="get_all_annual_reviews" doc:name="get_all_annual_reviews"/>
+        <flow-ref name="getAllAnnualReviews" doc:name="getAllAnnualReviews"/>
 
     </flow>
     <flow name="get:/annualreview/{annual_review_id}:annualReview_sys_api-config">
-        <flow-ref name="get_annual_review_for_id" doc:name="get_annual_review_for_id"/>
+        <flow-ref name="getAnnualReviewForId" doc:name="getAnnualReviewForId"/>
 
     </flow>
     <flow name="post:/annualreview:application/json:annualReview_sys_api-config">
-        <flow-ref name="insert_annual_review" doc:name="insert_annual_review"/>
+        <flow-ref name="insertAnnualReview" doc:name="insertAnnualReview"/>
 
     </flow>
     <apikit:mapping-exception-strategy name="annualReview_sys_api-apiKitGlobalExceptionMapping">

@@ -7,7 +7,7 @@
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-<db:mysql-config name="MySQL_Configuration" host="localhost" port="3306" user="root" password="znani" database="annualreviewapi" doc:name="MySQL Configuration"/>
+<db:mysql-config name="MySQL_Configuration"      doc:name="MySQL Configuration" url="jdbc:mysql://52.86.46.76:3306/ms3employeedb?user=ms3esb&amp;password=5at8U6nnCdY8q6dX&amp;noAccessToProcedureBodies=true"/>
     <choice-exception-strategy name="globalChoice_Exception_Strategy">
         <catch-exception-strategy when="#[exception.causedBy(java.sql.SQLIntegrityConstraintViolationException)]" doc:name="exception.causedBy(java.sql.SQLIntegrityConstraintViolationException)">
             <set-property propertyName="http.status" value="412" doc:name="Property"/>
