@@ -5,7 +5,11 @@ import java.util.Map;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
-
+/**
+ * 
+ * @author ZTej
+ * Builds WHERE clause based on the query params passed
+ */
 public class WhereQueryBuilder implements Callable{
 
 	@Override
@@ -14,7 +18,7 @@ public class WhereQueryBuilder implements Callable{
 		MuleMessage muleMessage = eventContext.getMessage();
 	    Map<String, String> queryParams = muleMessage.getInboundProperty("http.query.params");
 		String whereClause = generateWhereClause(queryParams);
-	    eventContext.getMessage().setInvocationProperty("WHERE_CLAUSE", whereClause);
+	    eventContext.getMessage().setInvocationProperty("whereClause", whereClause);
 	        return eventContext.getMessage().getPayload();
 	    }
 	/**
