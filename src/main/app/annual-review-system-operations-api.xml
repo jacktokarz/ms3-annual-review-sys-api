@@ -55,7 +55,7 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
                     <db:parameterized-query><![CDATA[INSERT INTO ANNUAL_REVIEW (supervisor_id,employee_id,self_assessment_avg,mgr_assessment_avg,completed_dt,status,start_dt) VALUES (#[payload.supervisor_id],#[payload.employee_id],#[payload.self_assessment_avg], #[payload.mgr_assessment_avg],IF(((#[payload.completed_dt] is null) or (#[payload.completed_dt]='')), NULL,#[payload.completed_dt]),#[payload.status],#[payload.start_dt])]]></db:parameterized-query>
                 </db:insert>
                 <set-variable variableName="annualReviewID" value="#[payload[0].GENERATED_KEY]" doc:name="newly created annual review ID"/>
-                <set-property value="http://localhost:8081/api/annualReview/#[flowVars.annualReviewID]" propertyName="location" doc:name="Set Location header" />
+                <set-property value="http://${http.host}:${http.port}/api/system/annualReviews/#[flowVars.annualReviewID]" propertyName="location" doc:name="Set Location header" />
                 <set-payload value="{&quot;message&quot;:&quot;Annual Review created Successfully&quot;}" doc:name="Set Payload - success message"/>
             </when>
             <otherwise>
