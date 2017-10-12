@@ -32,7 +32,7 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
         <db:select config-ref="MySQL_Config" doc:name="Database - GET all annual reviews">
             <db:dynamic-query><![CDATA[SELECT * FROM ANNUAL_REVIEW #[flowVars.whereClause]]]></db:dynamic-query>
         </db:select>
-        <flow-ref name="404RouterSubflow" doc:name="404RouterSubflow"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
         <exception-strategy ref="globalChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
     </flow>
     <flow name="getAnnualReviewForId">

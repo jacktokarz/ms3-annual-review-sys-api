@@ -27,13 +27,10 @@ types:
             type: AnnualReview[]
             example: !include example/annual-review-list-example.json
       400:
+        description: when request is incorrect or corrupted and server could not understand it
         body:
           application/json:
             example: { "message" : "Bad request"}
-      404:
-        body:
-          application/json:
-            example: { "message" : "Resource not found"}
   post:
     description: create a new annual review record
     body:
@@ -49,10 +46,12 @@ types:
           application/json:
             example: {"message":"created successfully"}
       409:
+        description: When you try to post the same record again
         body:
           application/json:
             example: {"message":"Annual Review already exists"}
       400:
+        description: when request is incorrect or corrupted and server could not understand it
         body:
           application/json:
             example: { "message" : "Bad request"}
@@ -71,10 +70,12 @@ types:
             type: AnnualReview
             example: !include example/annual-review-example.json
       400:
+        description: when request is incorrect or corrupted and server could not understand it
         body:
           application/json:
             example: { "message" : "Bad Request"}
       404:
+        description: If the URI requested is invalid or the resource requested does not exist
         body:
           application/json:
             example: { "message" : "Resource not found"}
@@ -90,10 +91,12 @@ types:
           application/json:
             example: { "message" : "Annual review updated Successfully"}
       400:
+        description: when request is incorrect or corrupted and server could not understand it
         body:
           application/json:
             example: { "message" : "Bad Request"}
       404:
+        description: If the URI requested is invalid or the resource requested does not exist
         body:
           application/json:
             example: { "message" : "Resource not found"}
@@ -103,10 +106,12 @@ types:
       204:
         description: "Annual review has been successfully deleted"
       400:
+        description: when request is incorrect or corrupted and server could not understand it
         body:
           application/json:
             example: { "message" : "Bad request"}
       404:
+        description: If the URI requested is invalid or the resource requested does not exist
         body:
           application/json:
             example: { "message" : "Resource not found"}
