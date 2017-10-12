@@ -5,8 +5,8 @@ mediaType: application/json
 baseUri: http://localhost:8081/api/system/annualReviews
 protocols: [HTTP,HTTPS]
 types:
-  AnnualReview:
-    type: !include types/annualReview.raml
+  annualReview:
+    type: !include types/annual-review.raml
 
 /:
   get:
@@ -24,7 +24,7 @@ types:
       200:
         body:
           application/json:
-            type: AnnualReview[]
+            type: annualReview[]
             example: !include example/annual-review-list-example.json
       400:
         description: when request is incorrect or corrupted and server could not understand it
@@ -35,7 +35,7 @@ types:
     description: create a new annual review record
     body:
       application/json:
-        type: AnnualReview
+        type: annualReview
     responses:
       201:
         headers:
@@ -67,7 +67,7 @@ types:
       200:
         body:
           application/json:
-            type: AnnualReview
+            type: annualReview
             example: !include example/annual-review-example.json
       400:
         description: when request is incorrect or corrupted and server could not understand it
@@ -83,7 +83,7 @@ types:
     description: Update an existing annual review
     body:
       application/json:
-        type: AnnualReview
+        type: annualReview
         required: true
     responses:
       204:
