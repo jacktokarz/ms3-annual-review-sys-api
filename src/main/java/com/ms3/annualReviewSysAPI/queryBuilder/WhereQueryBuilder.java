@@ -1,11 +1,18 @@
 package com.ms3.annualReviewSysAPI.queryBuilder;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 
+import com.google.common.base.CaseFormat;
+/**
+ * 
+ * @author ZTej
+ * Builds WHERE clause based on the query params passed
+ */
 public class WhereQueryBuilder implements Callable{
 
 	@Override
@@ -14,7 +21,7 @@ public class WhereQueryBuilder implements Callable{
 		MuleMessage muleMessage = eventContext.getMessage();
 	    Map<String, String> queryParams = muleMessage.getInboundProperty("http.query.params");
 		String whereClause = generateWhereClause(queryParams);
-	    eventContext.getMessage().setInvocationProperty("WHERE_CLAUSE", whereClause);
+	    eventContext.getMessage().setInvocationProperty("whereClause", whereClause);
 	        return eventContext.getMessage().getPayload();
 	    }
 	/**
@@ -23,7 +30,6 @@ public class WhereQueryBuilder implements Callable{
 	 * @return
 	 */
 	private static String generateWhereClause(Map<String, String> queryParams){
-			
 		StringBuilder whereClause = new StringBuilder();
 		if (queryParams.isEmpty()) {
 			return whereClause.toString();
@@ -34,10 +40,10 @@ public class WhereQueryBuilder implements Callable{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if (isFirstParam) {
-				whereClause.append(key + " = " + value);
+				whereClause.append(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = " + value);
 				isFirstParam = false;
 			} else {
-				whereClause.append(" AND " + key + " = " + value);
+				whereClause.append(" AND " + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = " + value);
 			}
 		}
 		return whereClause.toString();

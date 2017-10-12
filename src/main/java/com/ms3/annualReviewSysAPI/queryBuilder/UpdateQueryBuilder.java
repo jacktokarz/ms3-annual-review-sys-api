@@ -7,7 +7,11 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
-
+/**
+ * 
+ * @author ZTej
+ * Builds Update Query using uri params and payload
+ */
 public class UpdateQueryBuilder implements Callable{
 	
 	public static final String COMMA = ",";
@@ -17,13 +21,18 @@ public class UpdateQueryBuilder implements Callable{
 		MuleMessage muleMessage = eventContext.getMessage();
 		Map payloadMap =  (Map) muleMessage.getPayload();	
 		Map<String, String> uriParams = muleMessage.getInboundProperty("http.uri.params");
-		String annualReviewId = uriParams.get("annual_review_id");
+		String annualReviewId = uriParams.get("annualReviewId");
 		String updateQuery = buildUpdateQuery(payloadMap, annualReviewId);
-		eventContext.getMessage().setInvocationProperty("UPDATE_QUERY", updateQuery);
+		eventContext.getMessage().setInvocationProperty("updateQuery", updateQuery);
 		return eventContext.getMessage().getPayload();
 	}
 	
-	
+	/**
+	 * 
+	 * @param payloadMap
+	 * @param annualReviewId
+	 * @return
+	 */
 	private static String buildUpdateQuery(Map payloadMap, String annualReviewId){
 		StringBuilder updateQuery = new StringBuilder();
 		updateQuery.append(" UPDATE ANNUAL_REVIEW SET ");
