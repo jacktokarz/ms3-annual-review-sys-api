@@ -6,6 +6,8 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 
     <flow name="annual-review-system-api-main">
         <http:listener config-ref="HttpListenerConfig" path="/api/system/annualReviews/*" doc:name="HTTP"/>
+        <set-variable variableName="corrId" value="#[message.inboundProperties.corrId==null?message.id:message.inboundProperties.corrId]" doc:name="Variable-corrId"/>
+        <logger message="CorrelationID=#[flowVars.corrId]" level="INFO" doc:name="Logger-MULE-ELK"/>
         <apikit:router config-ref="annual-review-system-api-config" doc:name="APIkit Router"/>
         <exception-strategy ref="annual-review-system-api-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy"/>
     </flow>

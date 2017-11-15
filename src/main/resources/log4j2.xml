@@ -16,6 +16,10 @@
             <SizeBasedTriggeringPolicy size="10 MB" />
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
+        <!-- Mule-ELK Socket Configuration -->
+        <Socket name="socket" host="${sys:logstash.socket.host}" port="${sys:logstash.socket.port}">
+            <PatternLayout pattern="%d [mule-annual-review-sys-api] [%t] [${sys:app.env}] %-5p %c - %m%n" />
+        </Socket>
     </Appenders>
     <Loggers>
     	
@@ -46,5 +50,9 @@
         <AsyncRoot level="INFO">
             <AppenderRef ref="file" />
         </AsyncRoot>
+        <Root level="INFO">
+            <AppenderRef ref="socket"/>
+            <AppenderRef ref="file"/>
+         </Root>
     </Loggers>
 </Configuration>
