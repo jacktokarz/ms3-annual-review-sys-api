@@ -20,6 +20,10 @@ types:
         type: integer
         required: false
         description: Fetch all annual reviews that belong to a supervisor id
+      startDt:
+        type: date-only
+        required: false
+        description: Fetch all annual reviews that are created on a day
     responses:
       200:
         body:
