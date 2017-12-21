@@ -3,6 +3,7 @@ package com.ms3.annualReviewSysAPI.queryBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
@@ -40,10 +41,18 @@ public class WhereQueryBuilder implements Callable{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if (isFirstParam) {
-				whereClause.append(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = " + value);
+				if(StringUtils.isNumeric(value)){
+					whereClause.append(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = " + value);
+				}else{
+					whereClause.append(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = '"+value+"'");
+				}
 				isFirstParam = false;
 			} else {
-				whereClause.append(" AND " + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = " + value);
+				if(StringUtils.isNumeric(value)){
+					whereClause.append(" AND " + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = " + value);
+				}else{
+					whereClause.append(" AND " + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = '"+value+"'");
+				}
 			}
 		}
 		return whereClause.toString();
