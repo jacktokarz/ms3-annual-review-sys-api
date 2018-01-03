@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <flow name="annual-review-system-api-main">
+        <http:listener config-ref="HttpListenerConfig" path="/api/system/annualReviews/*" doc:name="HTTP"/>
+        <set-variable variableName="corrId" value="#[message.inboundProperties.corrId==null?message.id:message.inboundProperties.corrId]" doc:name="Variable-corrId"/>
+        <logger message="CorrelationID=#[flowVars.corrId]" level="INFO" doc:name="Logger-MULE-ELK"/>
+        <apikit:router config-ref="annual-review-system-api-config" doc:name="APIkit Router"/>
+        <exception-strategy ref="annual-review-system-api-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy"/>
+    </flow>
+    <flow name="annual-review-system-api-console">
+        <http:listener config-ref="HttpListenerConfig" path="/api/system/annualReviews/console/*" doc:name="HTTP"/>
+        <apikit:console config-ref="annual-review-system-api-config" doc:name="APIkit Console"/>
+    </flow>
+    <flow name="delete:/{annualReviewId}:annual-review-system-api-config">
+        <flow-ref name="deleteAnnualReviewWithId" doc:name="deleteAnnualReviewWithId"/>
+
+    </flow>
+    <flow name="patch:/{annualReviewId}:application/json:annual-review-system-api-config">
+        <flow-ref name="updateAnnualReviewForId" doc:name="updateAnnualReviewForId"/>
+
+    </flow>
+    <flow name="get:/:annual-review-system-api-config">
+        <flow-ref name="getAllAnnualReviews" doc:name="getAllAnnualReviews"/>
+
+    </flow>
+    <flow name="get:/{annualReviewId}:annual-review-system-api-config">
+        <flow-ref name="getAnnualReviewForId" doc:name="getAnnualReviewForId"/>
+
+    </flow>
+    <flow name="post:/:application/json:annual-review-system-api-config">
+        <flow-ref name="insertAnnualReview" doc:name="insertAnnualReview"/>
+
+    </flow>
+    <apikit:mapping-exception-strategy name="annual-review-system-api-apiKitGlobalExceptionMapping">
+        <apikit:mapping statusCode="404">
+            <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="405">
+            <apikit:exception value="org.mule.module.apikit.exception.MethodNotAllowedException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="415">
+            <apikit:exception value="org.mule.module.apikit.exception.UnsupportedMediaTypeException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="406">
+            <apikit:exception value="org.mule.module.apikit.exception.NotAcceptableException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="400">
+            <apikit:exception value="org.mule.module.apikit.exception.BadRequestException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+    </apikit:mapping-exception-strategy>
+</mule>

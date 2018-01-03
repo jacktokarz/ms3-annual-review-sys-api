@@ -1,0 +1,121 @@
+#%RAML 1.0
+title: Annual Review System API
+version: 1.0
+mediaType: application/json
+baseUri: http://localhost:8081/api/system/annualReviews
+protocols: [HTTP,HTTPS]
+types:
+  annualReview:
+    type: !include types/annual-review.raml
+
+/:
+  get:
+    description: Fetch all available annual reviews
+    queryParameters:
+      employeeId:
+        type: integer
+        required: false
+        description: Fetch all annual reviews that belong to an employee id
+      supervisorId:
+        type: integer
+        required: false
+        description: Fetch all annual reviews that belong to a supervisor id
+      startDt:
+        type: date-only
+        required: false
+        description: Fetch all annual reviews that are created on a day
+    responses:
+      200:
+        body:
+          application/json:
+            type: annualReview[]
+            example: !include example/annual-review-list-example.json
+      400:
+        description: when request is incorrect or corrupted and server could not understand it
+        body:
+          application/json:
+            example: { "message" : "Bad request"}
+  post:
+    description: create a new annual review record
+    body:
+      application/json:
+        type: annualReview
+    responses:
+      201:
+        headers:
+          Location:
+            description: URI pointing to newly created Annual Review
+            example: http://localhost:8081/api/system/annualreviews/23
+        body:
+          application/json:
+            example: {"message":"created successfully"}
+      409:
+        description: When you try to post the same record again
+        body:
+          application/json:
+            example: {"message":"Annual Review already exists"}
+      400:
+        description: when request is incorrect or corrupted and server could not understand it
+        body:
+          application/json:
+            example: { "message" : "Bad request"}
+/{annualReviewId}:
+  displayName: annualReviewId
+  uriParameters:
+    annualReviewId:
+      type: integer
+      required: true
+  get:
+    description: Fetch an Annual Review based on id
+    responses:
+      200:
+        body:
+          application/json:
+            type: annualReview
+            example: !include example/annual-review-example.json
+      400:
+        description: when request is incorrect or corrupted and server could not understand it
+        body:
+          application/json:
+            example: { "message" : "Bad Request"}
+      404:
+        description: If the URI requested is invalid or the resource requested does not exist
+        body:
+          application/json:
+            example: { "message" : "Resource not found"}
+  patch:
+    description: Update an existing annual review
+    body:
+      application/json:
+        type: annualReview
+        required: true
+    responses:
+      204:
+        body:
+          application/json:
+            example: { "message" : "Annual review updated Successfully"}
+      400:
+        description: when request is incorrect or corrupted and server could not understand it
+        body:
+          application/json:
+            example: { "message" : "Bad Request"}
+      404:
+        description: If the URI requested is invalid or the resource requested does not exist
+        body:
+          application/json:
+            example: { "message" : "Resource not found"}
+  delete:
+    description: Delete an annual review record based on id
+    responses:
+      204:
+        description: "Annual review has been successfully deleted"
+      400:
+        description: when request is incorrect or corrupted and server could not understand it
+        body:
+          application/json:
+            example: { "message" : "Bad request"}
+      404:
+        description: If the URI requested is invalid or the resource requested does not exist
+        body:
+          application/json:
+            example: { "message" : "Resource not found"}
