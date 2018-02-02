@@ -31,7 +31,7 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
         <dw:transform-message doc:name="Transform Message - Convert Int values to true or false">
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
-%function intToBoolean(field) null when field==null otherwise true when field > 0 otherwise false
+%function intToBoolean(field) field > 0 unless field == null otherwise null
 ---
 payload map {
   annual_review_id:$.annual_review_id,
