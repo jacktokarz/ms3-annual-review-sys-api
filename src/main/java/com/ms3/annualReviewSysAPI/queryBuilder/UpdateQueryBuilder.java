@@ -52,16 +52,15 @@ public class UpdateQueryBuilder implements Callable{
 			if(pair.getValue()!=null){
 		    value = pair.getValue().toString();
 			}
-			if(StringUtils.isNumeric(value)){
+			if(value.isEmpty()){
+				updateQuery.append(key+" = ''");
+			}else if(StringUtils.isNumeric(value) || value=="false" || value=="true"){
 				updateQuery.append(key+" = "+value);
-				System.out.println(updateQuery);
 			}else{
 			 updateQuery.append(key+" = '"+value+"'");
-			 System.out.println(updateQuery);
 			}
 			iteration++;
 		}
-		System.out.println(updateQuery);
 		return (updateQuery.toString()+ " WHERE annual_review_id = "+annualReviewId);
 	}
 
