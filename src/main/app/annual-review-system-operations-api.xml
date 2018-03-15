@@ -27,11 +27,36 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
         <set-property propertyName="http.status" value="404" doc:name="Property - set http status"/>
         <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" doc:name="Set Payload - error message"/>
     </flow>
+    <sub-flow name="convertIntValuesToBoolean">
+        <dw:transform-message doc:name="Transform Message - Convert Int values to true or false">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+%function intToBoolean(field) field > 0 unless field == null otherwise null
+---
+payload map {
+  annual_review_id:$.annual_review_id,
+  employee_id:$.employee_id,
+  supervisor_id:$.supervisor_id,
+  self_assessment_avg:$.self_assessment_avg,
+  mgr_assessment_avg:$.mgr_assessment_avg,
+  completed_dt:$.completed_dt,
+  start_dt:$.start_dt,
+  status:$.status,
+  emp_submit_dt:$.emp_submit_dt,
+  sup_submit_dt:$.sup_submit_dt,
+  meeting_dt:$.meeting_dt,
+  final_rating:$.final_rating,
+  emp_comments:$.emp_comments,
+  emp_signed:intToBoolean($.emp_signed)
+}]]></dw:set-payload>
+        </dw:transform-message>
+    </sub-flow>
     <flow name="getAllAnnualReviews">
         <component class="com.ms3.annualReviewSysAPI.queryBuilder.WhereQueryBuilder" doc:name="Java - build where query based on query params"/>
         <db:select config-ref="Employee-MySQL-Config" doc:name="Database - GET all annual reviews">
             <db:dynamic-query><![CDATA[SELECT * FROM ANNUAL_REVIEW #[flowVars.whereClause]]]></db:dynamic-query>
         </db:select>
+        <flow-ref name="convertIntValuesToBoolean" doc:name="convertIntValuesToBoolean"/>
         <json:object-to-json-transformer doc:name="Object to JSON"/>
         <exception-strategy ref="globalChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
     </flow>
@@ -39,6 +64,7 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
         <db:select config-ref="Employee-MySQL-Config" doc:name="Database - GET annual review based on ID">
             <db:parameterized-query><![CDATA[SELECT * FROM ANNUAL_REVIEW WHERE annual_review_id=#[message.inboundProperties.'http.uri.params'.annualReviewId]]]></db:parameterized-query>
         </db:select>
+        <flow-ref name="convertIntValuesToBoolean" doc:name="convertIntValuesToBoolean"/>
         <flow-ref name="404RouterSubflow" doc:name="404RouterSubflow"/>
         <exception-strategy ref="globalChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
     </flow>

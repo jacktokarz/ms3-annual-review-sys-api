@@ -6,5 +6,11 @@
   "mgr_assessment_avg":4,
   "completed_dt":"2015-08-04",
   "start_dt":"2015-07-04",
-  "status":"Completed"
+  "status":"Completed",
+  "emp_submit_dt":"2015-08-04",
+  "sup_submit_dt":"2015-08-04",
+  "meeting_dt":"2015-08-04",
+  "final_rating":4,
+  "emp_signed":false,
+  "emp_comments":"none"
 }

@@ -41,14 +41,14 @@ public class WhereQueryBuilder implements Callable{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if (isFirstParam) {
-				if(StringUtils.isNumeric(value)){
+				if(StringUtils.isNumeric(value)|| value=="false" || value=="true"){
 					whereClause.append(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = " + value);
 				}else{
 					whereClause.append(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = '"+value+"'");
 				}
 				isFirstParam = false;
 			} else {
-				if(StringUtils.isNumeric(value)){
+				if(StringUtils.isNumeric(value)|| value=="false" || value=="true"){
 					whereClause.append(" AND " + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = " + value);
 				}else{
 					whereClause.append(" AND " + CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key) + " = '"+value+"'");
